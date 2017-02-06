@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 using System;
 using System.Security.Cryptography.X509Certificates;
+using Mono.Security.Interface;
 
 namespace Mono.Btls.Interface
 {
@@ -44,9 +45,14 @@ namespace Mono.Btls.Interface
 			Instance.LoadLocations (file, path);
 		}
 
-		public void AddTrustedRoots ()
+		public void SetupCertificateStore (MonoTlsSettings settings, bool server)
 		{
-			Instance.AddTrustedRoots ();
+			Instance.SetupCertificateStore (settings, server);
+		}
+
+		public void SetupCertificateStore ()
+		{
+			Instance.SetupCertificateStore ();
 		}
 
 		public void AddCertificate (BtlsX509 x509)

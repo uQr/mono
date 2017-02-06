@@ -24,12 +24,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 #if SECURITY_DEP && MONO_FEATURE_BTLS
+#if MONO_SECURITY_ALIAS
+extern alias MonoSecurity;
+#endif
+
 using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
+
+#if MONO_SECURITY_ALIAS
+using MonoSecurity::Mono.Security.Interface;
+#else
+using Mono.Security.Interface;
+#endif
 
 namespace Mono.Btls
 {
@@ -157,12 +167,6 @@ namespace Mono.Btls
 			return mono_btls_x509_store_get_count (Handle.DangerousGetHandle ());
 		}
 
-		internal void AddTrustedRoots ()
-		{
-			var systemRoot = MonoBtlsProvider.GetSystemStoreLocation ();
-			LoadLocations (null, systemRoot);
-		}
-
 		public MonoBtlsX509Lookup AddLookup (MonoBtlsX509LookupType type)
 		{
 			if (lookupHash == null)
@@ -210,6 +214,79 @@ namespace Mono.Btls
 			var androidLookup = new MonoBtlsX509LookupAndroid ();
 			var lookup = new MonoBtlsX509Lookup (this, MonoBtlsX509LookupType.MONO);
 			lookup.AddMono (androidLookup);
+		}
+#endif
+
+		public void SetupCertificateStore (MonoTlsSettings settings, bool server)
+		{
+#if MONODROID
+			SetupCertificateStore ();
+			return;
+#else
+			if (settings?.CertificateSearchPaths == null) {
+				SetupCertificateStore ();
+				return;
+			}
+
+			foreach (var path in settings.CertificateSearchPaths) {
+				if (string.Equals (path, "@default", StringComparison.Ordinal)) {
+					AddTrustAnchors (settings, server);
+					AddUserStore ();
+					AddMachineStore ();
+				} else if (string.Equals (path, "@user", StringComparison.Ordinal))
+					AddUserStore ();
+				else if (string.Equals (path, "@machine", StringComparison.Ordinal))
+					AddMachineStore ();
+				else if (string.Equals (path, "@trusted", StringComparison.Ordinal))
+					AddTrustAnchors (settings, server);
+				else if (path.StartsWith ("@pem:", StringComparison.Ordinal)) {
+					var realPath = path.Substring (5);
+					if (Directory.Exists (realPath))
+						AddDirectoryLookup (realPath, MonoBtlsX509FileType.PEM);
+				} else if (path.StartsWith ("@der:", StringComparison.Ordinal)) {
+					var realPath = path.Substring (5);
+					if (Directory.Exists (realPath))
+						AddDirectoryLookup (realPath, MonoBtlsX509FileType.ASN1);
+				} else {
+					if (Directory.Exists (path))
+						AddDirectoryLookup (path, MonoBtlsX509FileType.PEM);
+				}
+			}
+#endif
+		}
+
+		public void SetupCertificateStore ()
+		{
+#if MONODROID
+			SetDefaultPaths ();
+			AddAndroidLookup ();
+#else
+			AddUserStore ();
+			AddMachineStore ();
+#endif
+		}
+
+#if !MONODROID
+		void AddUserStore ()
+		{
+			var userPath = MonoBtlsX509StoreManager.GetStorePath (MonoBtlsX509StoreType.UserTrustedRoots);
+			if (Directory.Exists (userPath))
+				AddDirectoryLookup (userPath, MonoBtlsX509FileType.PEM);
+		}
+
+		void AddMachineStore ()
+		{
+			var machinePath = MonoBtlsX509StoreManager.GetStorePath (MonoBtlsX509StoreType.MachineTrustedRoots);
+			if (Directory.Exists (machinePath))
+				AddDirectoryLookup (machinePath, MonoBtlsX509FileType.PEM);
+		}
+
+		void AddTrustAnchors (MonoTlsSettings settings, bool server)
+		{
+			if (settings?.TrustAnchors == null)
+				return;
+			var trust = server ? MonoBtlsX509TrustKind.TRUST_CLIENT : MonoBtlsX509TrustKind.TRUST_SERVER;
+			AddCollection (settings.TrustAnchors, trust);
 		}
 #endif
 

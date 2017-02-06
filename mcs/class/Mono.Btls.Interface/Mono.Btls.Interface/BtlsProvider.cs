@@ -83,11 +83,6 @@ namespace Mono.Btls.Interface
 			return MonoBtlsProvider.CreateChain ();
 		}
 
-		public static string GetSystemStoreLocation ()
-		{
-			return MonoBtlsProvider.GetSystemStoreLocation ();
-		}
-
 		public static BtlsX509VerifyParam GetVerifyParam_SslClient ()
 		{
 			return new BtlsX509VerifyParam (MonoBtlsX509VerifyParam.GetSslClient ());

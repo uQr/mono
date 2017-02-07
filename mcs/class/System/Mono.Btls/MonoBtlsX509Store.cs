@@ -220,7 +220,7 @@ namespace Mono.Btls
 		public void AddTrustedRoots (MonoTlsSettings settings, bool server)
 		{
 			if (settings?.CertificateSearchPaths == null)
-				AddTrustedRoots (store, settings, server);
+				AddTrustedRoots (settings, server);
 
 #if MONODROID
 			AddTrustedRoots ();

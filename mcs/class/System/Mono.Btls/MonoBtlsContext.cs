@@ -222,10 +222,12 @@ namespace Mono.Btls
 		{
 			ctx.CertificateStore.AddTrustedRoots (Settings, IsServer);
 
+#if FIXME
 			if (Settings != null && Settings.TrustAnchors != null) {
 				var trust = IsServer ? MonoBtlsX509TrustKind.TRUST_CLIENT : MonoBtlsX509TrustKind.TRUST_SERVER;
 				ctx.CertificateStore.AddCollection (Settings.TrustAnchors, trust);
 			}
+#endif
 		}
 
 		void InitializeConnection ()

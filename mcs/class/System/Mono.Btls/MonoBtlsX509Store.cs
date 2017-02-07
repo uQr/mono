@@ -219,15 +219,15 @@ namespace Mono.Btls
 
 		public void AddTrustedRoots (MonoTlsSettings settings, bool server)
 		{
+			if (settings?.CertificateSearchPaths == null)
+				AddTrustedRoots (store, settings, server);
+
 #if MONODROID
-			SetDefaultPaths ();
-			AddAndroidLookup ();
+			AddTrustedRoots ();
 			return;
 #else
 			if (settings?.CertificateSearchPaths == null) {
-				AddTrustAnchors (settings, server);
-				AddUserStore ();
-				AddMachineStore ();
+				AddTrustedRoots ();
 				return;
 			}
 

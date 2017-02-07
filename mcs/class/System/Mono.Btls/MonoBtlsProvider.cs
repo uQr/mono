@@ -150,7 +150,7 @@ namespace Mono.Btls
 			using (var nativeChain = MonoBtlsProvider.GetNativeChain (certificates))
 			using (var param = GetVerifyParam (targetHost, serverMode))
 			using (var storeCtx = new MonoBtlsX509StoreCtx ()) {
-				store.SetupCertificateStore (validator.Settings, serverMode);
+				store.AddTrustedRoots (validator.Settings, serverMode);
 
 				storeCtx.Initialize (store, nativeChain);
 
@@ -176,7 +176,7 @@ namespace Mono.Btls
 		{
 			using (var store = new MonoBtlsX509Store ())
 			using (var storeCtx = new MonoBtlsX509StoreCtx ()) {
-				store.SetupCertificateStore ();
+				store.AddTrustedRoots ();
 
 				storeCtx.Initialize (store, chain);
 

@@ -217,14 +217,14 @@ namespace Mono.Btls
 		}
 #endif
 
-		public void SetupCertificateStore (MonoTlsSettings settings, bool server)
+		public void AddTrustedRoots (MonoTlsSettings settings, bool server)
 		{
 #if MONODROID
-			SetupCertificateStore ();
+			AddTrustedRoots ();
 			return;
 #else
 			if (settings?.CertificateSearchPaths == null) {
-				SetupCertificateStore ();
+				AddTrustedRoots ();
 				return;
 			}
 
@@ -255,7 +255,7 @@ namespace Mono.Btls
 #endif
 		}
 
-		public void SetupCertificateStore ()
+		public void AddTrustedRoots ()
 		{
 #if MONODROID
 			SetDefaultPaths ();

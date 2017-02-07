@@ -45,14 +45,14 @@ namespace Mono.Btls.Interface
 			Instance.LoadLocations (file, path);
 		}
 
-		public void SetupCertificateStore (MonoTlsSettings settings, bool server)
+		public void AddTrustedRoots (MonoTlsSettings settings, bool server)
 		{
-			Instance.SetupCertificateStore (settings, server);
+			Instance.AddTrustedRoots (settings, server);
 		}
 
-		public void SetupCertificateStore ()
+		public void AddTrustedRoots ()
 		{
-			Instance.SetupCertificateStore ();
+			Instance.AddTrustedRoots ();
 		}
 
 		public void AddCertificate (BtlsX509 x509)

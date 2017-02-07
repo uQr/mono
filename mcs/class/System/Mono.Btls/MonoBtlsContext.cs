@@ -218,9 +218,9 @@ namespace Mono.Btls
 			isAuthenticated = true;
 		}
 
-		void SetupCertificateStore ()
+		void AddTrustedRoots ()
 		{
-			ctx.CertificateStore.SetupCertificateStore (Settings, IsServer);
+			ctx.CertificateStore.AddTrustedRoots (Settings, IsServer);
 
 			if (Settings != null && Settings.TrustAnchors != null) {
 				var trust = IsServer ? MonoBtlsX509TrustKind.TRUST_CLIENT : MonoBtlsX509TrustKind.TRUST_SERVER;
@@ -237,7 +237,7 @@ namespace Mono.Btls
 			ctx.SetDebugBio (errbio);
 #endif
 
-			SetupCertificateStore ();
+			AddTrustedRoots ();
 
 			if (!IsServer || AskForClientCertificate)
 				ctx.SetVerifyCallback (VerifyCallback, false);

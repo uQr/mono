@@ -15,6 +15,7 @@
 #include <pthread.h>
 #include "utils/mono-sigcontext.h"
 #include "mach-support.h"
+#include "mono-context.h"
 
 // For reg numbers
 #include <mono/arch/amd64/amd64-codegen.h>
